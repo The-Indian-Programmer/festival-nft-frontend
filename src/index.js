@@ -4,7 +4,7 @@ import App from './App';
 import './index.css';
 import { BrowserRouter as Router } from "react-router-dom";
 import { PUBLIC_URL } from "../src/configs/Contants.js";
-
+// import web3 provider from etherjs
 import { Provider } from 'react-redux'
 import {store} from './redux/store';
 ReactDOM.render(

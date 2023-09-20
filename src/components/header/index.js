@@ -167,7 +167,7 @@ const Header = () => {
 
     return (
         <>
-            <nav className={`${scrolling ? 'bg-white text-blue-500' : 'text-white bg-gradient-to-r from-blue-500 to-purple-600'} py-4 px-6 flex items-center justify-between shadow-lg fixed top-0 left-0 right-0`}>
+            <nav className={`${scrolling ? 'bg-white text-blue-500' : 'text-white bg-gradient-to-r from-blue-500 to-purple-600'} py-4 px-6 flex items-center justify-between shadow-lg  top-0 left-0 right-0`}>
                 <Link to='/' className="flex items-center" role='button'>
                     <svg className="h-6 w-6 text-white bg-blue-500 rounded-full p-1 ">
                         <path className="fill-current" d="M9.313 14.92c-.028.193-.07.379-.124.56l-.375 1.499h5.373l-.374-1.499a3.001 3.001 0 0 0-.124-.56l-.506-1.52a4.468 4.468 0 0 0-.468-1.015L12 10.5l-.218-.655a4.468 4.468 0 0 0-.468 1.015l-.506 1.52zM16.5 5h-2V3a2 2 0 0 0-4 0v2h-2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-1 10H6V7h9v8z" />
