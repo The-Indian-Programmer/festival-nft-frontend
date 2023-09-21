@@ -1,6 +1,9 @@
 import React from 'react'
+import PaymentModal from '../../../common-components/PaymentModal'
 
 const BuyTicket = () => {
+
+    const [showPaymentModal, setShowPaymentModal] = React.useState(false)
 
 
     const listedTicket = [
@@ -32,8 +35,10 @@ const BuyTicket = () => {
 
 
     const handleBuyTicket = () => {
-        console.log('buy ticket')
+        setShowPaymentModal(true)
     }
+
+ 
 
     return (
         <React.Fragment>
@@ -48,6 +53,7 @@ const BuyTicket = () => {
                     </div>
                     <div className='listed-ticket mt-5'>
                         <div className="container mx-auto">
+                            <h2 className="text-white text-3xl font-bold mb-4">Listed Ticket</h2>
                             <div className="grid grid-cols-12 gap-4">
                                 {
                                     listedTicket.map((ticket, index) => {
@@ -77,6 +83,7 @@ const BuyTicket = () => {
                     </div>
                 </div>
             </div>
+            {showPaymentModal && <PaymentModal show={showPaymentModal} handleClose={() => setShowPaymentModal(false)} />}
         </React.Fragment>
     )
 }

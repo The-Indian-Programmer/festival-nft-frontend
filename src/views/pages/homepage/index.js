@@ -1,7 +1,7 @@
 import React from 'react'
 import { ethers } from 'ethers'
 import { useSelector } from 'react-redux'
-import { isWalletConnected } from '../../../configs/Funtions'
+import { isEmpty, isWalletConnected } from '../../../configs/Funtions'
 import Swal from 'sweetalert2'
 import TicketInfoModal from '../../../common-components/TicketInfoModal'
 import TransactionProgress from '../../../common-components/TransactionProgress'
@@ -13,6 +13,7 @@ const HomePage = () => {
 
   // Redux vars
   const userData = useSelector(state => state.auth.userData)
+  const contractData = useSelector(state => state.common.contractData)
 
   // State vars
   const [showPaymentModal, setShowPaymentModal] = React.useState(false)
@@ -89,14 +90,14 @@ const HomePage = () => {
 
           <div className="flex flex-col mt-56 items-center h-96">
             <h2 className="text-white text-3xl font-bold mb-4">FESTIVAL NFT TICKET</h2>
-            <p className="text-white text-lg mb-6">Buy Ticket Only <span className='font-extrabold'>0.1 Eth</span></p>
+            <p className="text-white text-lg mb-6">Buy Ticket Only <span className='font-extrabold'>{!isEmpty(contractData.price) ? contractData.price : '0.0'} Eth</span></p>
             <button onClick={handleTicketPurchase} className="bg-white text-blue-500 py-2 px-6 rounded-full text-lg font-semibold hover:bg-blue-500 hover:text-white transition duration-300">Buy Now</button>
           </div>
         </div>
       </div>
 
       {/* <TicketInfoModal /> */}
-      <TransactionProgress isOpen={true} onClose={() => setShowPaymentModal(false)} txStatus='pending' />
+      {/* <TransactionProgress isOpen={true} onClose={() => setShowPaymentModal(false)} txStatus='pending' /> */}
     </React.Fragment>
   )
 }

@@ -1,10 +1,9 @@
 // ** Reducers Imports
-import FundersList from '../views/pages/allfunders/store/index'
 import Auth from './authentication'
-
+import commonStore from './commonStore'
 const rootReducer = {
-  FundersList,
-  auth: Auth
+  auth: Auth,
+  common: commonStore,
 }
 
 export default rootReducer
