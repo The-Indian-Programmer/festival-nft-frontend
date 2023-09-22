@@ -62,7 +62,6 @@ const PaymentModal = ({ show, handleClose }) => {
                 value: price,
             });
             const buyTicketReceipt = await buyTicketTx.wait(1);
-            console.log(buyTicketReceipt)
             localStorage.setItem('transactionhash', buyTicketReceipt.transactionHash)
             dispatch(getContractData({ address: contractData.contractAddress, chainId: contractData.chainId, ticketAddress: contractData.ticketAddress }))
             setIsLoading(false) 
@@ -70,8 +69,7 @@ const PaymentModal = ({ show, handleClose }) => {
 
         } catch (error) {
             console.log(error)
-        }
-        
+        }  
     }
 
     return (
@@ -96,6 +94,14 @@ const PaymentModal = ({ show, handleClose }) => {
                     <div className="mb-4">
                         <label className="block text-gray-600 font-semibold mb-2">NFT Address</label>
                         <input disabled value={contractData.contractAddress} name='nftAddress' type="text" className="w-full px-2 py-3 italic text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-600 font-semibold mb-2">Ticket Name</label>
+                        <input disabled value={contractData.ticketName} name='ticketName' type="text" className="w-full px-2 py-3 italic text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-600 font-semibold mb-2">Ticket Symbol</label>
+                        <input disabled value={contractData.ticketSymbol} name='ticketSymbol' type="text" className="w-full px-2 py-3 italic text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
                     </div>
                     {!isLoading ? <button type='submit' className="w-full mt-5 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none" >
                         Buy Ticket

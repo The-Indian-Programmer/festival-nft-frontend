@@ -9,6 +9,9 @@ import { getContractData } from './redux/commonStore';
 import { isEmpty } from './configs/Funtions';
 import contractAddress from './constants/contractAddress/festivalTIcketMarketPlaceAddresses.json'
 import ticketAddress from './constants/contractAddress/festivalTIcketAddresses.json'
+import { ethers } from 'ethers';
+import ContractEvents from './contractevents';
+import { getMyTicketList } from './redux/authentication';
 const App = () => {
 
   const { isConnected, connection, chainId, address } = useWallet();
@@ -26,6 +29,16 @@ const App = () => {
       dispatch(getContractData({ address: newContractAddress, chainId: chainId, ticketAddress: newTicketAddress }))
     }
   }, [isConnected, connection, chainId, address]);
+
+
+
+  /* useEffect to listen smart contract events */
+  useEffect(() => {
+    if (isConnected && chainId && !isEmpty(address)) {
+      ContractEvents();
+    }
+  }, [isConnected, connection, chainId, address]);
+
   return (
     <Suspense fallback={'pageLoader'}>
       <Switch>

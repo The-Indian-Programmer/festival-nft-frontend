@@ -1,22 +1,24 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { ethers } from 'ethers'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { isEmpty, isWalletConnected } from '../../../configs/Funtions'
 import Swal from 'sweetalert2'
 import TicketInfoModal from '../../../common-components/TicketInfoModal'
 import TransactionProgress from '../../../common-components/TransactionProgress'
 import { useHistory } from 'react-router-dom'
+import { getMyTicketList } from '../../../redux/authentication';
 const HomePage = () => {
 
-  const PAYABLE_VALUE = ethers.utils.parseEther('0.1')
 
 
   // Redux vars
   const userData = useSelector(state => state.auth.userData)
+  const userTickets = useSelector(state => state.auth.userTickets)
   const contractData = useSelector(state => state.common.contractData)
+  const dispatch = useDispatch()
 
   // State vars
-  const [showPaymentModal, setShowPaymentModal] = React.useState(false)
+  const [ticketViewInfo, setTicketViewInfo] = React.useState({})
 
   /* Routes vars */
   const history = useHistory()
@@ -36,18 +38,26 @@ const HomePage = () => {
   }
 
 
-  const myTicket = [
-    {
-      id: 1,
-      name: 'Ticket 1',
-      price: '0.1',
-    },
-    {
-      id: 2,
-      name: 'Ticket 2',
-      price: '0.1',
+  useEffect(() => {
+    if (isWalletConnected(userData) && !isEmpty(contractData)  && !isEmpty(contractData.contractAddress)) {
+      dispatch(getMyTicketList({ contractAddress: contractData.contractAddress, chainId: contractData.chainId, userAddress: userData.address }))
     }
-  ]
+  }, [userData, contractData])
+
+
+  /* Function to handle ticket view */
+  const handleTicketView = (ticket) => {
+    let data = {
+      ...ticket,
+      contractAddress: contractData.contractAddress,
+      ticketAddress: contractData.ticketAddress,
+      chainId: contractData.chainId,
+      ticketName: contractData.ticketName,
+      ticketSymbol: contractData.ticketSymbol
+    }
+    setTicketViewInfo(data)
+    
+  }
 
 
   return (
@@ -61,19 +71,19 @@ const HomePage = () => {
               <h2 className="text-white text-3xl font-bold mb-4">My Ticket</h2>
               <div className="grid grid-cols-12 gap-4">
                 {
-                  myTicket.map((ticket, index) => {
+                  !isEmpty(userTickets) && userTickets.map((ticket, index) => {
                     return (
                       <div key={index} className=" col-span-12 sm:col-span-6 md:col-span-6 lg:col-span-4 xl:col-span-3 2xl:col-span-3">
                         <div className="bg-white rounded-lg p-5">
                           <div className="flex items-center justify-between">
-                            <h5 className="text-xl font-bold">{ticket.name}</h5>
-                            <h5 className="text-xl font-bold">{ticket.price} ETH</h5>
+                            <h5 className="text-xl font-bold">Ticket {ticket.ticketId}</h5>
+                            <h5 className="text-xl font-bold">{ticket.ticketPrice} ETH</h5>
                           </div>
                           <div className="flex items-center justify-between mt-5">
                             <button className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">
-                              List Ticket
+                              {ticket.isListed ? 'Cancel List' : 'List Ticket'}
                             </button>
-                            <button className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">
+                            <button onClick={() => handleTicketView(ticket)} className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">
                               View Ticket
                             </button>
                           </div>
@@ -96,7 +106,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* <TicketInfoModal /> */}
+      {!isEmpty(ticketViewInfo) && <TicketInfoModal data={ticketViewInfo} handleClose={() => setTicketViewInfo({})} />}
       {/* <TransactionProgress isOpen={true} onClose={() => setShowPaymentModal(false)} txStatus='pending' /> */}
     </React.Fragment>
   )

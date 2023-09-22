@@ -62,7 +62,7 @@ const BuyTicket = () => {
                                                 <div className="bg-white rounded-lg p-5">
                                                     <div className="flex items-center justify-between">
                                                         <h5 className="text-xl font-bold">{ticket.name}</h5>
-                                                        <h5 className="text-xl font-bold">{ticket.price} ETH</h5>
+                                                        <h5 className="text-xl font-bold">{ticket.ticketPrice} ETH</h5>
                                                     </div>
                                                     <div className="flex items-center justify-between mt-5">
                                                         <button className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">

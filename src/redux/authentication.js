@@ -1,16 +1,25 @@
 // ** Redux Imports
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import axios from 'axios'
+import { API_URL } from '../configs/Contants'
 
+axios.defaults.baseURL = API_URL
 
 const initialUser = () => {
   const item = window.localStorage.getItem('userData')
   return item ? JSON.parse(item) : {}
 }
 
+export const getMyTicketList = createAsyncThunk('authentication/getUserTickets', async (payload) => {
+  const response = await axios.post(`/api/ticket/user`, payload);
+  return response.data
+})
+
 export const authSlice = createSlice({
   name: 'authentication',
   initialState: {
-    userData: initialUser()
+    userData: initialUser(),
+    userTickets: []
   },
   reducers: {
     handleWalletConnect: (state, action) => {
@@ -22,6 +31,11 @@ export const authSlice = createSlice({
       state.userData = {}
       localStorage.removeItem('userData')
     }
+  },
+  extraReducers: builder => {
+    builder.addCase(getMyTicketList.fulfilled, (state, action) => {
+      state.userTickets = action.payload.data
+    })
   }
 })
 
