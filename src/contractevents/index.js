@@ -40,6 +40,29 @@ const ContractEvents = () => {
             })            
         }
     });
+
+    contract.on("TicketListed", async (ticketId, seller, price) => {
+        const ethPrice = ethers.utils.formatEther((price));
+        let payload = {
+            ticketId: parseInt(ticketId),
+            seller: seller,
+            price: ethPrice,
+            chainId: chainId,
+            contractAddress: newContractAddress
+        }
+        const response = await axios.post('/api/ticket/list', payload);
+        if (response.data.status) {
+            Swal.fire({
+                text: 'Ticket listed successfully',
+                icon: 'success',
+            })
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'Ticket listed but not saved in database',
+            })            
+        }
+    });
 };
 
 export default ContractEvents;

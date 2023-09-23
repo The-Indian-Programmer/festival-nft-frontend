@@ -7,6 +7,7 @@ import TicketInfoModal from '../../../common-components/TicketInfoModal'
 import TransactionProgress from '../../../common-components/TransactionProgress'
 import { useHistory } from 'react-router-dom'
 import { getMyTicketList } from '../../../redux/authentication';
+import TIcket from './TIcket'
 const HomePage = () => {
 
 
@@ -59,7 +60,6 @@ const HomePage = () => {
     
   }
 
-
   return (
     <React.Fragment>
 
@@ -73,23 +73,7 @@ const HomePage = () => {
                 {
                   !isEmpty(userTickets) && userTickets.map((ticket, index) => {
                     return (
-                      <div key={index} className=" col-span-12 sm:col-span-6 md:col-span-6 lg:col-span-4 xl:col-span-3 2xl:col-span-3">
-                        <div className="bg-white rounded-lg p-5">
-                          <div className="flex items-center justify-between">
-                            <h5 className="text-xl font-bold">Ticket {ticket.ticketId}</h5>
-                            <h5 className="text-xl font-bold">{ticket.ticketPrice} ETH</h5>
-                          </div>
-                          <div className="flex items-center justify-between mt-5">
-                            <button className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">
-                              {ticket.isListed ? 'Cancel List' : 'List Ticket'}
-                            </button>
-                            <button onClick={() => handleTicketView(ticket)} className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">
-                              View Ticket
-                            </button>
-                          </div>
-
-                        </div>
-                      </div>
+                      <TIcket key={index} ticket={ticket} handleTicketView={handleTicketView}/>
                     )
                   })
                 }
