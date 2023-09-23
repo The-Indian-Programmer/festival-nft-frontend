@@ -1,43 +1,70 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PaymentModal from '../../../common-components/PaymentModal'
-
+import { useDispatch, useSelector } from 'react-redux'
+import {isWalletConnected} from '../../../configs/Funtions'
+import { getAllListedTicket } from './store/index'
+import {isEmpty} from '../../../configs/Funtions'
 const BuyTicket = () => {
+
+     // Redux vars
+  const userData = useSelector(state => state.auth.userData)
+  const allTickets = useSelector(state => state.nftTicket.tickets)
+  const contractData = useSelector(state => state.common.contractData)
+  const dispatch = useDispatch()
 
     const [showPaymentModal, setShowPaymentModal] = React.useState(false)
 
 
-    const listedTicket = [
-        {
-            id: 1,
-            name: 'Ticket 1',
-            price: '0.1',
-            isOwn: false,
-        },
-        {
-            id: 2,
-            name: 'Ticket 2',
-            price: '0.1',
-            isOwn: true,
-        },
-        {
-            id: 4,
-            name: 'Ticket 3',
-            price: '0.1',
-            isOwn: true,
-        },
-        {
-            id: 3,
-            name: 'Ticket 4',
-            price: '0.1',
-            isOwn: false,
+    // const listedTicket = [
+    //     {
+    //         id: 1,
+    //         name: 'Ticket 1',
+    //         price: '0.1',
+    //         isOwn: false,
+    //     },
+    //     {
+    //         id: 2,
+    //         name: 'Ticket 2',
+    //         price: '0.1',
+    //         isOwn: true,
+    //     },
+    //     {
+    //         id: 4,
+    //         name: 'Ticket 3',
+    //         price: '0.1',
+    //         isOwn: true,
+    //     },
+    //     {
+    //         id: 3,
+    //         name: 'Ticket 4',
+    //         price: '0.1',
+    //         isOwn: false,
+    //     }
+    // ]
+
+    const listedTicket = !isEmpty(allTickets) ? allTickets.map(item => {
+        return {
+            id: item.id,
+            name: item.ticketId,
+            price: item.price,
+            sellerAddress: item.sellerAddress,
+            isOwn: item.sellerAddress === userData.address ? true : false,
         }
-    ]
+    }) : []
 
 
     const handleBuyTicket = () => {
         setShowPaymentModal(true)
     }
 
+
+
+    /* Function to get data on mount */
+    useEffect(() => {
+        if (isWalletConnected(userData) && !isEmpty(contractData)  && !isEmpty(contractData.contractAddress)) {
+          dispatch(getAllListedTicket({ contractAddress: contractData.contractAddress, chainId: contractData.chainId }))
+        }
+      }, [userData, contractData])
  
 
     return (

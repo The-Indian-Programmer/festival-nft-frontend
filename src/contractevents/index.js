@@ -19,12 +19,11 @@ const ContractEvents = () => {
     
     
     contract.on("TicketBought", async (seller, ticketId, price) => {
-        const ethPrice = ethers.utils.formatEther((price));
         let payload = {
             ticketId: parseInt(ticketId),
             seller: seller,
-            price: ethPrice,
             chainId: chainId,
+            price: ethPrice,
             contractAddress: newContractAddress
         }
         const response = await axios.post('/api/ticket/buy', payload);
@@ -40,6 +39,7 @@ const ContractEvents = () => {
             })            
         }
     });
+    
 
     contract.on("TicketListed", async (ticketId, seller, price) => {
         const ethPrice = ethers.utils.formatEther((price));
@@ -60,6 +60,54 @@ const ContractEvents = () => {
             Swal.fire({
                 title: 'Error',
                 text: 'Ticket listed but not saved in database',
+            })            
+        }
+    });
+
+
+    contract.on("TicketRemoved", async (ticketId, seller, price) => {
+        const ethPrice = ethers.utils.formatEther((price));
+        let payload = {
+            ticketId: parseInt(ticketId),
+            seller: seller,
+            price: ethPrice,
+            chainId: chainId,
+            contractAddress: newContractAddress
+        }
+        const response = await axios.post('/api/ticket/cancel-list', payload);
+        if (response.data.status) {
+            Swal.fire({
+                text: 'Ticket removed successfully',
+                icon: 'success',
+            })
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'Ticket removed but not saved in database',
+            })            
+        }
+    });
+
+
+    contract.on("TicketUpdated", async (ticketId, seller, price) => {
+        const ethPrice = ethers.utils.formatEther((price));
+        let payload = {
+            ticketId: parseInt(ticketId),
+            seller: seller,
+            price: ethPrice,
+            chainId: chainId,
+            contractAddress: newContractAddress
+        }
+        const response = await axios.post('/api/ticket/update', payload);
+        if (response.data.status) {
+            Swal.fire({
+                text: 'Ticket updated successfully',
+                icon: 'success',
+            })
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'Ticket updated but not saved in database',
             })            
         }
     });

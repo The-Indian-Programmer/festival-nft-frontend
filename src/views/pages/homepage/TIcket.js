@@ -12,6 +12,7 @@ const TIcket = ({ ticket, handleTicketView }) => {
     const handleListTicket = (ticket) => {
         if (ticket.isListed) {
             // Cancel list ticket 
+            setListTicketInfo({...ticket, toUpdateTicket: true})
         } else {
             setListTicketInfo(ticket)
         }
@@ -28,7 +29,7 @@ const TIcket = ({ ticket, handleTicketView }) => {
                     </div>
                     <div className="flex items-center justify-between mt-5">
                         <button onClick={() => handleListTicket(ticket)} className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">
-                            {ticket.isListed ? 'Cancel List' : 'List Ticket'}
+                            {ticket.isListed ? 'Update Ticket' : 'List Ticket'}
                         </button>
                         <button onClick={() => handleTicketView(ticket)} className="border-2 border-purple-600 text-purple-600 font-extrabold bg-white px-3 py-1 rounded-sm">
                             View Ticket
