@@ -8,17 +8,18 @@ import Swal from "sweetalert2";
 
 axios.defaults.baseURL = API_URL;
 
-const chainId = 1337;
+const chainId = 11155111;
 let newContractAddress = !isEmpty(contractAddress[chainId]) ? contractAddress[chainId][contractAddress[chainId].length - 1]: '';
 
 const ContractEvents = () => {
-    const provider = new ethers.providers.WebSocketProvider("ws://localhost:7545");
+    const provider = new ethers.providers.WebSocketProvider("wss://eth-sepolia.g.alchemy.com/v2/bxH0mdnMkIkU9WLC4MCLd1aIK3F3lSHQ");
     const signer = provider.getSigner();
     const contract = new ethers.Contract(newContractAddress, contractAbi, signer);
     
     
     
     contract.on("TicketBought", async (seller, ticketId, price) => {
+        const ethPrice = ethers.utils.formatEther((price));
         let payload = {
             ticketId: parseInt(ticketId),
             seller: seller,

@@ -91,7 +91,6 @@ const HomePage = () => {
       </div>
 
       {!isEmpty(ticketViewInfo) && <TicketInfoModal data={ticketViewInfo} handleClose={() => setTicketViewInfo({})} />}
-      {/* <TransactionProgress isOpen={true} onClose={() => setShowPaymentModal(false)} txStatus='pending' /> */}
     </React.Fragment>
   )
 }

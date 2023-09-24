@@ -69,6 +69,8 @@ const PaymentModal = ({ show, handleClose }) => {
 
         } catch (error) {
             console.log(error)
+            console.log(error.message)
+            setIsLoading(false)
         }  
     }
 

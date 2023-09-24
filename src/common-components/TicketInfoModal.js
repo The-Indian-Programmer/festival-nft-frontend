@@ -15,6 +15,10 @@ const TicketInfoModal = ({handleClose, data}) => {
                         <input disabled value={data.ticketId} name='ticketId' type="number" className="w-full px-2 py-3 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
                     </div>
                     <div className="mb-4">
+                        <label className="block text-gray-600 font-semibold mb-2">Ticket Owner</label>
+                        <input disabled value={data.ticketOwner} name='ticketOwner' type="text" className="w-full px-2 py-3 italic text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
+                    </div>
+                    <div className="mb-4">
                         <label className="block text-gray-600 font-semibold mb-2">Ticket Address</label>
                         <input disabled value={data.ticketAddress} name='ticketAddress' type="text" className="w-full px-2 py-3 italic text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
                     </div>

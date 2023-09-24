@@ -3,15 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import contractAbi from '../../../../constants/contractAbi/festivalTicketMarketPlace.json'
-import ticketContractAbi from '../../../../constants/contractAbi/festivalTicketAbi.json'
 import { ethers } from 'ethers'
 import { getMyTicketList } from '../../../../redux/authentication'
 import LoadingButton from '../../../../common-components/LoadingButton'
+import { getAllListedTicket } from '../store'
 
-const TicketFormModal = ({ show, handleClose, data }) => {
+const NFTTicketUpdateOrBuy = ({ show, handleClose, data }) => {
 
   /* State vars */
-  const [isListingLoading, setIsListingLoading] = React.useState(false)
+  const [isBuyTicketLoading, setIsBuyTicketLoading] = React.useState(false)
   const [isUpdateLoading, setIsUpdateLoading] = React.useState(false)
   const [isCancelLoading, setIsCancelLoading] = React.useState(false)
 
@@ -25,10 +25,8 @@ const TicketFormModal = ({ show, handleClose, data }) => {
   const signer = provider.getSigner();
   const contract = new ethers.Contract(contractData.contractAddress, contractAbi, signer);
 
-  const ticketContract = new ethers.Contract(contractData.ticketAddress, ticketContractAbi, signer);
 
-
-  let ticketPrice = data.listedPrice ? Number(data.listedPrice) : data.ticketPrice ? Number(data.ticketPrice) : 0
+  let ticketPrice = data.listedPrice ? Number(data.listedPrice) : data.price ? Number(data.price) : 0
 
   const formik = useFormik({
     initialValues: {
@@ -50,31 +48,27 @@ const TicketFormModal = ({ show, handleClose, data }) => {
       if (data.toUpdateTicket) {
         handleTicketUpdatePrice({ newPrice: values.ticketPrice, ...data })
       } else {
-        handleListTicket({ newPrice: values.ticketPrice, ...data })
+        handleBuyTicket({ newPrice: values.ticketPrice, ...data })
       }
     },
   })
 
 
-  const handleListTicket = async (ticket) => {
+  const handleBuyTicket = async (ticket) => {
     try {
-      setIsListingLoading(true)
+      setIsBuyTicketLoading(true)
 
-      // Approve ticket for market place to sell
-      const approveTx = await ticketContract['approveToken'](contractData.contractAddress, ticket.ticketId);
-      await approveTx.wait(1);
-
-      const price = ethers.utils.parseEther(ticket.newPrice.toString())
-      const listTicketTx = await contract['listTicketForSale'](ticket.ticketId, price);
-      const listTicketReceipt = await listTicketTx.wait(1);
-      localStorage.setItem('transactionhash', listTicketReceipt.transactionHash)
+      const price = ethers.utils.parseEther(ticket.price)
+      const buyTicketTx = await contract['buyTicketFromListing'](ticket.ticketId, {value: price});
+      const buyTicketReceipt = await buyTicketTx.wait(1);
+      localStorage.setItem('transactionhash', buyTicketReceipt.transactionHash)
       dispatch(getMyTicketList({ contractAddress: contractData.contractAddress, chainId: contractData.chainId, userAddress: userData.address }))
-      setIsListingLoading(false)
+      setIsBuyTicketLoading(false)
       handleClose()
 
     } catch (error) {
       console.log(error)
-      setIsListingLoading(false)
+      setIsBuyTicketLoading(false)
     }
   }
 
@@ -102,7 +96,7 @@ const TicketFormModal = ({ show, handleClose, data }) => {
       const updatePriceTx = await contract['updateTicketPrice'](ticket.ticketId, price);
       const updatePriceReceipt = await updatePriceTx.wait(1);
       localStorage.setItem('transactionhash', updatePriceReceipt.transactionHash)
-      dispatch(getMyTicketList({ contractAddress: contractData.contractAddress, chainId: contractData.chainId, userAddress: userData.address }))
+       dispatch(getAllListedTicket({ contractAddress: contractData.contractAddress, chainId: contractData.chainId }))
       setIsUpdateLoading(false)
       handleClose()
 
@@ -110,7 +104,6 @@ const TicketFormModal = ({ show, handleClose, data }) => {
       console.log(error)
       setIsUpdateLoading(false)
     }
-    console.log('update price')
   }
 
 
@@ -118,7 +111,7 @@ const TicketFormModal = ({ show, handleClose, data }) => {
   const RemoveTicketButton = ({isLoading}) => {
     return (
       <>
-      {!isLoading ? <button disabled={isUpdateLoading || isListingLoading} className={`w-full mt-5 bg-red-500 mx-1 hover:bg-red-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none ${(isUpdateLoading || isListingLoading) && 'cursor-not-allowed'}`} type='button' onClick={handleTicketCancelList}>
+      {!isLoading ? <button disabled={isUpdateLoading || isBuyTicketLoading} className={`w-full mt-5 bg-red-500 mx-1 hover:bg-red-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none ${(isUpdateLoading || isBuyTicketLoading) && 'cursor-not-allowed'}`} type='button' onClick={handleTicketCancelList}>
         Remove from listing
       </button> : <LoadingButton disabled btnText='Please wait...' className='w-full mt-5 bg-red-500 mx-1 hover:bg-red-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none' />}
       </>
@@ -128,23 +121,22 @@ const TicketFormModal = ({ show, handleClose, data }) => {
   const UpdateTicketButton = ({isLoading}) => {
     return (
       <React.Fragment>
-      {!isLoading ?<button disabled={isListingLoading || isCancelLoading} type='submit' className={`w-full mt-5 bg-blue-500 mx-1 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none ${(isListingLoading || isCancelLoading) && 'cursor-not-allowed'}`}>
+      {!isLoading ?<button disabled={isBuyTicketLoading || isCancelLoading} type='submit' className={`w-full mt-5 bg-blue-500 mx-1 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none ${(isBuyTicketLoading || isCancelLoading) && 'cursor-not-allowed'}`}>
         Update Price
       </button> : <LoadingButton disabled btnText='Please wait...' className='w-full mt-5 bg-blue-500 mx-1 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none' />}
       </React.Fragment>
     )
   }
 
-  const ListTicketButton = ({isLoading}) => {
+  const BuyTicketButton = ({isLoading}) => {
     return (
       <React.Fragment>
-      {!isLoading ? <button disabled={isCancelLoading || isUpdateLoading } type='submit' className={`w-full mt-5 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none ${(isCancelLoading || isUpdateLoading) && 'cursor-not-allowed'}`} >
-        List Ticket
+      {!isLoading ? <button disabled={isCancelLoading || isUpdateLoading } type='submit' className={`w-full mt-5 bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none ${(isCancelLoading || isUpdateLoading) && 'cursor-not-allowed'}`} >
+        Buy Ticket
       </button> : <LoadingButton disabled btnText='Please wait...' className="w-full mt-5 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-lg focus:outline-none" />}
       </React.Fragment>
     )
   }
-
 
 
   return (
@@ -152,13 +144,17 @@ const TicketFormModal = ({ show, handleClose, data }) => {
       <div className="modal-overlay fixed inset-0 bg-gray-700 opacity-95"></div>
       <div className="modal-container bg-white p-8 mx-auto rounded z-50 shadow-lg w-11/12 sm:w-11/12 md:w-2/3 lg:w-1/2 xl:w-1/2 2xl:w-1/2">
         <div className="flex justify-between items-center mb-10">
-          <h3 className="text-xl ">{data.toUpdateTicket ? 'Update Ticket' : 'List Ticket'}</h3>
+          <h3 className="text-xl ">{data.toUpdateTicket ? 'Update Ticket' : 'Buy Ticket'}</h3>
           <i className=' text-2xl cursor-pointer' onClick={handleClose}>X</i>
         </div>
         <form className='font-bold' onSubmit={formik.handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-600 font-semibold mb-2">Ticket Id</label>
             <input disabled value={data.ticketId} name='ticketId' type="number" className="w-full px-2 py-3 bg-gray-100 border italic rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-600 font-semibold mb-2">Ticket Address</label>
+            <input disabled value={contractData.ticketAddress} name='ticketAddress' type="text" className="w-full px-2 py-3 italic text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
           </div>
           <div className="mb-4">
             <label className="block text-gray-600 font-semibold mb-2">Ticket Name</label>
@@ -173,19 +169,19 @@ const TicketFormModal = ({ show, handleClose, data }) => {
             <input disabled value={data.ticketPrice} name='originalPrice' type="text" className="w-full px-2 py-3 italic text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter TicketID" />
           </div>}
           <div className="mb-4">
-            <label className="block text-gray-600 font-semibold mb-2">{data.toCancelList ? 'Listed Price' : 'New Price'}</label>
-            <input disabled={data.toCancelList} value={formik.values.ticketPrice} name='ticketPrice' onChange={formik.handleChange} type="text" className="w-full px-2 py-3 font-extrabold text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter Price" />
+            <label className="block text-gray-600 font-semibold mb-2">{data.toUpdateTicket ? 'Listed Price' : 'Price'}</label>
+            <input disabled={!data.toUpdateTicket} value={formik.values.ticketPrice} name='ticketPrice' onChange={formik.handleChange} type="text" className="w-full px-2 py-3 font-extrabold text-gray-800 bg-gray-100 border rounded focus:outline-none focus:ring focus:border-blue-300" placeholder="Enter Price" />
             {formik.errors.ticketPrice && formik.touched.ticketPrice && <span className='text-red-500 font-bold text-sm'>{formik.errors.ticketPrice}</span>}
           </div>
 
           {(data.toUpdateTicket ? <div className='flex flex-col sm:flex-row xs:flex-col md:flex-row lg:flex-row xl:flex-row 2xl:flex-row items-center justify-between '>
             <RemoveTicketButton isLoading={isCancelLoading}/>
             <UpdateTicketButton isLoading={isUpdateLoading}/>
-          </div> : <ListTicketButton isLoading={isListingLoading} />) }
+          </div> : <BuyTicketButton isLoading={isBuyTicketLoading} />) }
         </form>
       </div>
     </div>
   )
 }
 
-export default TicketFormModal
+export default NFTTicketUpdateOrBuy
